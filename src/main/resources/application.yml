@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pubg
+    username: pubg
+    password: pubg
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+pubg:
+  api-key: .env.PUBG_API_KEY
+  api-host: https://api.pubg.com
+  retry:
+    max-attempts: 3
+    backoff-ms: 500
+  rate-limit:
+    requests-per-second: 8
+  ingest:
+    default-match-count: 20
+    leaderboard-size: 50
+    sample-per-player: 20
+
+server:
+  port: 8080

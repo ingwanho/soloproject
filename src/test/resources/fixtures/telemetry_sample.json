@@ -1,0 +1,150 @@
+[
+  {
+    "_T": "LogPhaseChange",
+    "_D": "2023-10-10T00:00:00Z",
+    "phase": 1,
+    "safeZoneRadius": 4000,
+    "safeZonePosition": {
+      "x": 1000,
+      "y": 1000
+    }
+  },
+  {
+    "_T": "LogPhaseChange",
+    "_D": "2023-10-10T00:03:00Z",
+    "phase": 2,
+    "safeZoneRadius": 2000,
+    "safeZonePosition": {
+      "x": 2000,
+      "y": 2000
+    }
+  },
+  {
+    "_T": "Position",
+    "_D": "2023-10-10T00:00:10Z",
+    "character": {
+      "accountId": "test-account",
+      "name": "Test",
+      "location": {
+        "x": 1200,
+        "y": 900
+      },
+      "isInVehicle": false
+    }
+  },
+  {
+    "_T": "Position",
+    "_D": "2023-10-10T00:00:40Z",
+    "character": {
+      "accountId": "test-account",
+      "name": "Test",
+      "location": {
+        "x": 1300,
+        "y": 1100
+      },
+      "isInVehicle": true
+    }
+  },
+  {
+    "_T": "Position",
+    "_D": "2023-10-10T00:03:10Z",
+    "character": {
+      "accountId": "test-account",
+      "name": "Test",
+      "location": {
+        "x": 2100,
+        "y": 1900
+      },
+      "isInVehicle": false
+    }
+  },
+  {
+    "_T": "Position",
+    "_D": "2023-10-10T00:04:00Z",
+    "character": {
+      "accountId": "test-account",
+      "name": "Test",
+      "location": {
+        "x": 2300,
+        "y": 2100
+      },
+      "isInVehicle": false
+    }
+  },
+  {
+    "_T": "LogItemThrow",
+    "_D": "2023-10-10T00:03:15Z",
+    "character": {
+      "accountId": "test-account",
+      "name": "Test",
+      "location": {
+        "x": 2100,
+        "y": 1900
+      }
+    },
+    "item": {
+      "subCategory": "Grenade"
+    }
+  },
+  {
+    "_T": "LogPlayerAttack",
+    "_D": "2023-10-10T00:03:16Z",
+    "attacker": {
+      "name": "Test",
+      "accountId": "test-account",
+      "location": {
+        "x": 2100,
+        "y": 1900
+      }
+    },
+    "victim": {
+      "name": "Enemy",
+      "accountId": "enemy",
+      "location": {
+        "x": 2120,
+        "y": 1920
+      }
+    }
+  },
+  {
+    "_T": "LogPlayerTakeDamage",
+    "_D": "2023-10-10T00:03:20Z",
+    "attacker": {
+      "name": "Test",
+      "accountId": "test-account",
+      "location": {
+        "x": 2100,
+        "y": 1900
+      }
+    },
+    "victim": {
+      "name": "Enemy",
+      "accountId": "enemy",
+      "location": {
+        "x": 2120,
+        "y": 1920
+      }
+    },
+    "damageTypeCategory": "Grenade"
+  },
+  {
+    "_T": "LogPlayerDowned",
+    "_D": "2023-10-10T00:03:25Z",
+    "attacker": {
+      "name": "Test",
+      "accountId": "test-account",
+      "location": {
+        "x": 2100,
+        "y": 1900
+      }
+    },
+    "victim": {
+      "name": "Enemy",
+      "accountId": "enemy",
+      "location": {
+        "x": 2120,
+        "y": 1920
+      }
+    }
+  }
+]
