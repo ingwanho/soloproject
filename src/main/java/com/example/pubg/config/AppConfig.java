@@ -33,7 +33,9 @@ public class AppConfig {
     public RestTemplate pubgRestTemplate(RestTemplateBuilder builder) {
         ClientHttpRequestInterceptor authInterceptor = (request, body, execution) -> {
             request.getHeaders().add("Authorization", "Bearer " + apiKey);
-            request.getHeaders().add("Accept", "application/vnd.api+json");
+            // PUBG API는 GET 요청에서 Content-Type을 강제 설정하면 415를 줄 수 있다.
+            request.getHeaders().setAccept(Collections.singletonList(
+                    org.springframework.http.MediaType.parseMediaType("application/vnd.api+json")));
             return execution.execute(request, body);
         };
         return builder

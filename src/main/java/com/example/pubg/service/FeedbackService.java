@@ -37,7 +37,8 @@ public class FeedbackService {
         cards.add(pickBest(aggregate.getGrenadeMetrics(), "grenade"));
 
         cards.sort(Comparator.comparingDouble(FeedbackCard::getPercentile).reversed());
-        return new PlayerFeedbackResponse(accountId, cards);
+        String narrative = buildNarrative(cards);
+        return new PlayerFeedbackResponse(accountId, cards, narrative);
     }
 
     private FeedbackCard pickBest(Map<String, Double> metrics, String category) {
@@ -86,6 +87,32 @@ public class FeedbackService {
             default:
                 return scoreText;
         }
+    }
+
+    private String buildNarrative(List<FeedbackCard> cards) {
+        if (cards.isEmpty()) {
+            return "데이터가 부족해 상위권 대비 피드백을 생성하지 못했습니다.";
+        }
+        FeedbackCard best = cards.get(0);
+        FeedbackCard worst = cards.get(cards.size() - 1);
+
+        String tendency = best.getPercentile() >= 60
+                ? "강점: " + best.getCategory() + "에서 " + best.getMetricKey() + "가 상위권 분포 대비 우수합니다."
+                : "강점: 특정 영역은 평균 수준입니다.";
+
+        String focus = worst.getPercentile() <= 50
+                ? "개선: " + worst.getCategory() + "의 " + worst.getMetricKey()
+                        + "를 끌어올리면 상위권과 격차가 빠르게 줄어듭니다."
+                : "개선: 균형 잡힌 지표입니다. 세부 최적화에 집중하세요.";
+
+        String direction = switch (worst.getCategory()) {
+            case "phase" -> "다음 세이프존 수축 전에 이동을 시작하고, 센터-엣지 밸런스를 시험해 보세요.";
+            case "combat" -> "교전 시 팀 각 벌리기와 동시 사격 타이밍을 맞추어 다운 전환률을 높이세요.";
+            case "grenade" -> "푸시 3초 전 투척을 습관화해 시야 확보와 진입 각을 만들면 상위권 패턴에 근접합니다.";
+            default -> "플레이 리듬을 일정하게 유지하며 리스크를 줄이세요.";
+        };
+
+        return tendency + " " + focus + " " + direction;
     }
 
     private String readableKey(String key) {

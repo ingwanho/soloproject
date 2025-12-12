@@ -32,16 +32,19 @@ public class PubgApiClient {
     private final SimpleRateLimiter rateLimiter;
     private final Duration backoff;
     private final int defaultMatchCount;
+    private final String shard;
 
     public PubgApiClient(
             RestTemplate restTemplate,
             SimpleRateLimiter rateLimiter,
             @Value("${pubg.retry.backoff-ms}") long backoffMs,
-            @Value("${pubg.ingest.default-match-count}") int defaultMatchCount) {
+            @Value("${pubg.ingest.default-match-count}") int defaultMatchCount,
+            @Value("${pubg.shard:kakao}") String shard) {
         this.restTemplate = restTemplate;
         this.rateLimiter = rateLimiter;
         this.backoff = Duration.ofMillis(backoffMs);
         this.defaultMatchCount = defaultMatchCount;
+        this.shard = shard;
     }
 
     @Retryable(
@@ -50,7 +53,7 @@ public class PubgApiClient {
             backoff = @Backoff(delayExpression = "${pubg.retry.backoff-ms}"))
     public String findAccountId(String nickname) {
         return executeWithRateLimit(() -> {
-            String path = "/shards/kakao/players?filter[playerNames]=" + nickname;
+            String path = "/shards/" + shard + "/players?filter[playerNames]=" + nickname;
             ResponseEntity<Map> response = restTemplate.exchange(path, HttpMethod.GET, HttpEntity.EMPTY, Map.class);
             List<Map<String, Object>> data = (List<Map<String, Object>>) response.getBody().get("data");
             if (data == null || data.isEmpty()) {
@@ -68,7 +71,7 @@ public class PubgApiClient {
     public List<MatchMeta> fetchRecentMatches(String accountId, Integer requestedCount) {
         int count = Optional.ofNullable(requestedCount).orElse(defaultMatchCount);
         return executeWithRateLimit(() -> {
-            String path = "/shards/kakao/players/" + accountId;
+            String path = "/shards/" + shard + "/players/" + accountId;
             ResponseEntity<Map> response = restTemplate.exchange(path, HttpMethod.GET, HttpEntity.EMPTY, Map.class);
             Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
             Map<String, Object> relationships = (Map<String, Object>) data.get("relationships");
@@ -89,7 +92,7 @@ public class PubgApiClient {
             backoff = @Backoff(delayExpression = "${pubg.retry.backoff-ms}"))
     public MatchMeta fetchMatchMeta(String matchId) {
         return executeWithRateLimit(() -> {
-            String path = "/shards/kakao/matches/" + matchId;
+            String path = "/shards/" + shard + "/matches/" + matchId;
             ResponseEntity<Map> response = restTemplate.exchange(path, HttpMethod.GET, HttpEntity.EMPTY, Map.class);
             Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
             Map<String, Object> attributes = (Map<String, Object>) data.get("attributes");
@@ -129,5 +132,9 @@ public class PubgApiClient {
     public List<String> fetchLeaderboardAccountIds(String mode, int size) {
         log.warn("fetchLeaderboardAccountIds is returning empty list (stub). Wire actual PUBG leaderboard endpoint.");
         return List.of();
+    }
+
+    public String getShard() {
+        return shard;
     }
 }

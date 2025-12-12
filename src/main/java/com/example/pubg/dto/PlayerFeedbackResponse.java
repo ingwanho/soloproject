@@ -5,10 +5,12 @@ import java.util.List;
 public class PlayerFeedbackResponse {
     private String accountId;
     private List<FeedbackCard> cards;
+    private String narrative;
 
-    public PlayerFeedbackResponse(String accountId, List<FeedbackCard> cards) {
+    public PlayerFeedbackResponse(String accountId, List<FeedbackCard> cards, String narrative) {
         this.accountId = accountId;
         this.cards = cards;
+        this.narrative = narrative;
     }
 
     public String getAccountId() {
@@ -17,5 +19,9 @@ public class PlayerFeedbackResponse {
 
     public List<FeedbackCard> getCards() {
         return cards;
+    }
+
+    public String getNarrative() {
+        return narrative;
     }
 }

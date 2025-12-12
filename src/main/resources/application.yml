@@ -20,8 +20,9 @@ spring:
       port: 6379
 
 pubg:
-  api-key: .env.PUBG_API_KEY
+  api-key: ${PUBG_API_KEY:dummy}
   api-host: https://api.pubg.com
+  shard: kakao
   retry:
     max-attempts: 3
     backoff-ms: 500
