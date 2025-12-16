@@ -32,10 +32,11 @@ services:
         condition: service_healthy
     environment:
       PUBG_API_KEY: ${PUBG_API_KEY}
+      PUBG_SHARD: ${PUBG_SHARD:-steam}
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pubg
       SPRING_DATASOURCE_USERNAME: pubg
       SPRING_DATASOURCE_PASSWORD: pubg
-      SPRING_REDIS_HOST: redis
+      SPRING_DATA_REDIS_HOST: redis
       HTTP_PROXY: http://http.docker.internal:3128
       HTTPS_PROXY: http://http.docker.internal:3128
       NO_PROXY: localhost,127.0.0.1,db,redis

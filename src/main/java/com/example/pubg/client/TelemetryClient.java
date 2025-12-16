@@ -60,4 +60,9 @@ public class TelemetryClient {
     public <T> T onFailure(RestClientException ex) {
         throw new PubgApiException("Telemetry fetch failed after retries", ex);
     }
+
+    @Recover
+    public <T> T onFailure(Exception ex) {
+        throw new PubgApiException("Telemetry fetch failed after retries", ex);
+    }
 }

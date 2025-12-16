@@ -16,13 +16,13 @@ spring:
     type: redis
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
 
 pubg:
   api-key: ${PUBG_API_KEY:dummy}
   api-host: https://api.pubg.com
-  shard: kakao
+  shard: ${PUBG_SHARD:steam}
   retry:
     max-attempts: 3
     backoff-ms: 500
@@ -35,3 +35,7 @@ pubg:
 
 server:
   port: 8080
+
+logging:
+  level:
+    com.example.pubg.client: DEBUG

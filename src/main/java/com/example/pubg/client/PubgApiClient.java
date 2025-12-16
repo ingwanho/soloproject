@@ -125,6 +125,11 @@ public class PubgApiClient {
         throw new PubgApiException("PUBG API failed after retries", ex);
     }
 
+    @Recover
+    public <T> T onFailure(Exception ex) {
+        throw new PubgApiException("PUBG API failed after retries", ex);
+    }
+
     /**
      * Placeholder for leaderboard collection. PUBG API exposes leaderboards per mode/platform.
      * Wire actual API path when credentials are available.

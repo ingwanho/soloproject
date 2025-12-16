@@ -37,14 +37,22 @@ public class IngestService {
     public IngestResponse ingestRecentMatches(IngestRequest request) {
         String accountId = pubgApiClient.findAccountId(request.getNickname());
         List<MatchMeta> metas = pubgApiClient.fetchRecentMatches(accountId, request.getMatchCount());
-
+        log.info("Found {} recent matches for accountId={}", metas.size(), accountId);
         FeatureAggregate aggregate = null;
         List<String> processedMatches = new ArrayList<>();
+        log.info("1");
         for (MatchMeta meta : metas) {
-            List<Map<String, Object>> telemetry = telemetryClient.fetchTelemetry(meta.telemetryUrl());
-            FeatureAggregate features = featureService.computeFeatures(accountId, meta, telemetry);
-            aggregate = aggregate == null ? features : aggregate.merge(features);
-            processedMatches.add(meta.matchId());
+            try {
+                log.info("Fetching telemetry for matchId={} url={}", meta.matchId(), meta.telemetryUrl());
+                List<Map<String, Object>> telemetry = telemetryClient.fetchTelemetry(meta.telemetryUrl());
+                FeatureAggregate features = featureService.computeFeatures(accountId, meta, telemetry);
+                aggregate = aggregate == null ? features : aggregate.merge(features);
+                processedMatches.add(meta.matchId());
+                log.info("Processed matchId={}", meta.matchId());
+            } catch (Exception e) {
+                log.error("Telemetry fetch failed for matchId={} url={}", meta.matchId(), meta.telemetryUrl(), e);
+                throw e;
+            }
         }
         if (aggregate != null) {
             store.put(accountId, aggregate);

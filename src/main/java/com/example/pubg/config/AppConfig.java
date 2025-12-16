@@ -11,10 +11,15 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.pubg.util.SimpleRateLimiter;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.util.Timeout;
 
 @Configuration
 @EnableCaching
@@ -31,6 +36,17 @@ public class AppConfig {
 
     @Bean
     public RestTemplate pubgRestTemplate(RestTemplateBuilder builder) {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(Timeout.ofSeconds(5))
+                .setConnectionRequestTimeout(Timeout.ofSeconds(5))
+                .setResponseTimeout(Timeout.ofSeconds(30))
+                .build();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .disableCookieManagement()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+
         ClientHttpRequestInterceptor authInterceptor = (request, body, execution) -> {
             request.getHeaders().add("Authorization", "Bearer " + apiKey);
             // PUBG API는 GET 요청에서 Content-Type을 강제 설정하면 415를 줄 수 있다.
@@ -40,8 +56,7 @@ public class AppConfig {
         };
         return builder
                 .rootUri(apiHost)
-                .setConnectTimeout(Duration.ofSeconds(5))
-                .setReadTimeout(Duration.ofSeconds(10))
+                .requestFactory(() -> requestFactory)
                 .additionalInterceptors(Collections.singletonList(authInterceptor))
                 .build();
     }
