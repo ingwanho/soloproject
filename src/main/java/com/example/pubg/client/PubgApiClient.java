@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,18 +34,21 @@ public class PubgApiClient {
     private final Duration backoff;
     private final int defaultMatchCount;
     private final String shard;
+    private final List<String> proAccounts;
 
     public PubgApiClient(
             RestTemplate restTemplate,
             SimpleRateLimiter rateLimiter,
             @Value("${pubg.retry.backoff-ms}") long backoffMs,
             @Value("${pubg.ingest.default-match-count}") int defaultMatchCount,
-            @Value("${pubg.shard:kakao}") String shard) {
+            @Value("${pubg.shard:kakao}") String shard,
+            @Value("${pubg.pro.accounts:}") String proAccounts) {
         this.restTemplate = restTemplate;
         this.rateLimiter = rateLimiter;
         this.backoff = Duration.ofMillis(backoffMs);
         this.defaultMatchCount = defaultMatchCount;
         this.shard = shard;
+        this.proAccounts = parseAccounts(proAccounts);
     }
 
     @Retryable(
@@ -135,11 +139,24 @@ public class PubgApiClient {
      * Wire actual API path when credentials are available.
      */
     public List<String> fetchLeaderboardAccountIds(String mode, int size) {
-        log.warn("fetchLeaderboardAccountIds is returning empty list (stub). Wire actual PUBG leaderboard endpoint.");
+        if (!proAccounts.isEmpty()) {
+            return proAccounts.stream().limit(size).toList();
+        }
+        log.warn("fetchLeaderboardAccountIds is returning empty list (stub). Configure pubg.pro.accounts or wire actual leaderboard endpoint.");
         return List.of();
     }
 
     public String getShard() {
         return shard;
+    }
+
+    private List<String> parseAccounts(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return List.of();
+        }
+        return Arrays.stream(raw.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
     }
 }
